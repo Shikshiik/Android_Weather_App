@@ -3,4 +3,9 @@
     <string name="city_name">New York</string>
     <string name="city_desc">Sunny</string>
     <string name="city_temp">24°C</string>
+    <string name="no_connection">No connection</string>
+    <string name="title_activity_favorite"></string>
+    <string name="your_message">Your message : </string>
+    <string name="action_settings">Settings</string>
+
 </resources>
