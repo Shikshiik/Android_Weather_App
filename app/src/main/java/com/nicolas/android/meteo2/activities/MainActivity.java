@@ -1,4 +1,4 @@
-package com.nicolas.android.meteo2;
+package com.nicolas.android.meteo2.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -8,13 +8,16 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.nicolas.android.meteo2.R;
+import com.nicolas.android.meteo2.activities.FavoriteActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -81,4 +84,7 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         Log.d("TAG", "MainActivity: onDestroy()");
     }
+
+
+
 }

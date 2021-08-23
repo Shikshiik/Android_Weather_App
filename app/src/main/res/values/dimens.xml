@@ -5,7 +5,8 @@
     <dimen name="activity_vertical_margin">0dp</dimen>
     <dimen name="activity_margin">16dp</dimen>
     <dimen name="text_size_medium">25dp</dimen>
-
+    <dimen name="activity_vertical_margin2">16sp</dimen>
+    <dimen name="activity_horizontal_margin2">16sp</dimen>
     <dimen name="activity_padding">16dp</dimen>
     <dimen name="show_weather_temp">80dp</dimen>
     <dimen name="Main_city_size">30dp</dimen>

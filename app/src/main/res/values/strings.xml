@@ -7,5 +7,7 @@
     <string name="title_activity_favorite"></string>
     <string name="your_message">Your message : </string>
     <string name="action_settings">Settings</string>
+    <string name="add_city">City name</string>
+    <string name="supprimer">Delete</string>
 
 </resources>

@@ -8,6 +8,8 @@
     <string name="your_message">Votre message : </string>
     <string name="title_activity_favorite"></string>
     <string name="action_settings">Paramètres</string>
+    <string name="add_city">Nom de ville</string>
+    <string name="supprimer">Supprimer</string>
 
 
 </resources>

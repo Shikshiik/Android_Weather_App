@@ -12,10 +12,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Meteo2">
         <activity
-            android:name=".FavoriteActivity"
+            android:name=".activities.FavoriteActivity"
             android:label="@string/title_activity_favorite"
             android:theme="@style/Theme.Meteo2.NoActionBar"></activity>
-        <activity android:name=".MainActivity">
+        <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
