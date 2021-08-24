@@ -74,12 +74,12 @@ public class FavoriteActivity extends AppCompatActivity {
                 });
 
                 builder.create().show();
+
             }
         });
 
         mCities = new ArrayList<>();
-
-        City city1 = new City("Montréal", "Légères pluies", "22°C", R.drawable.weather_rainy_grey);
+        City city1 = new City("Montréal", getResources().getString(R.string.petites_pluies), "22°C", R.drawable.weather_rainy_grey);
         City city2 = new City("New York", "Ensoleillé", "22°C", R.drawable.weather_sunny_grey);
         City city3 = new City("Paris", "Nuageux", "24°C", R.drawable.weather_foggy_grey);
         City city4 = new City("Toulouse", "Pluies modérées", "20°C", R.drawable.weather_rainy_grey);
@@ -99,7 +99,7 @@ public class FavoriteActivity extends AppCompatActivity {
     }
 
     public void updateWeatherDataCityName(final String cityName) {
-        City city = new City(cityName, "Ensoleillé", "28°C", R.drawable.weather_sunny_grey);
+        City city = new City(cityName, "Sunny", "99°C", R.drawable.weather_sunny_grey);
         mCities.add(city);
         mAdapter.notifyDataSetChanged();
     }

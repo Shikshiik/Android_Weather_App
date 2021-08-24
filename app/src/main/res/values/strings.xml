@@ -9,5 +9,9 @@
     <string name="action_settings">Settings</string>
     <string name="add_city">City name</string>
     <string name="supprimer">Delete</string>
+    <string name="petites_pluies">Light rain</string>
+    <string name="delete">Delete </string>
+
+
 
 </resources>

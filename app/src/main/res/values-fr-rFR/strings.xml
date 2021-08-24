@@ -10,6 +10,8 @@
     <string name="action_settings">Paramètres</string>
     <string name="add_city">Nom de ville</string>
     <string name="supprimer">Supprimer</string>
+    <string name="petites_pluies">Légères pluies</string>
+    <string name="delete">Supprimer </string>
 
 
 </resources>
