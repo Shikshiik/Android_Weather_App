@@ -5,9 +5,9 @@
     android:background="?android:attr/selectableItemBackground"
     android:gravity="center"
     android:orientation="horizontal"
-    android:paddingLeft="@dimen/activity_horizontal_margin2"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingTop="10dp"
-    android:paddingRight="@dimen/activity_horizontal_margin2"
+    android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingBottom="10dp">
 
     <LinearLayout

@@ -3,7 +3,7 @@
     <string name="city_name">New York</string>
     <string name="city_desc">Sunny</string>
     <string name="city_temp">24°C</string>
-    <string name="no_connection">No connection</string>
+    <string name="no_connexion">No connection</string>
     <string name="title_activity_favorite"></string>
     <string name="your_message">Your message : </string>
     <string name="action_settings">Settings</string>
@@ -11,6 +11,8 @@
     <string name="supprimer">Delete</string>
     <string name="petites_pluies">Light rain</string>
     <string name="delete">Delete </string>
+    <string name="api_error">An error has occured</string>
+    <string name="place_not_found">City not found </string>
 
 
 

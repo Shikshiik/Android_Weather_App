@@ -17,7 +17,8 @@ import com.nicolas.android.meteo2.models.City;
 
 import java.util.ArrayList;
 
-public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHolder> {
+public class FavoriteAdapter
+        extends RecyclerView.Adapter<FavoriteAdapter.ViewHolder> {
 
     private ArrayList<City> mArrayListCities;
     private Context mContext;
@@ -40,7 +41,6 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
             super(view);
 
             view.setOnLongClickListener(mOnLongClickListener);
-
             view.setTag(this);
 
             mTextViewCity = (TextView) view.findViewById(R.id.text_view_item_city);
@@ -65,7 +65,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
         City city = mArrayListCities.get(position);
 
         holder.mTextViewCity.setText(city.mName);
-        holder.mImageViewWeather.setImageResource(city.mWeatherIcon);
+        holder.mImageViewWeather.setImageResource(city.mWeatherResIconGrey);
         holder.mTextViewTemperature.setText(city.mTemperature);
         holder.mTextViewDescription.setText(city.mDescription);
 
@@ -86,9 +86,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
             final int position = holder.position;
 
             final AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-
-            builder.setMessage(builder.getContext().getResources().getString(R.string.delete) + " " + holder.mTextViewCity.getText().toString() + " ?");
-
+            builder.setMessage("Delete " + holder.mTextViewCity.getText().toString() + " ?");
             builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     mArrayListCities.remove(position);
@@ -109,4 +107,3 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
         }
     };
 }
-

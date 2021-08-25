@@ -7,19 +7,28 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.nicolas.android.meteo2.R;
 import com.nicolas.android.meteo2.activities.FavoriteActivity;
+import com.nicolas.android.meteo2.models.City;
+import com.nicolas.android.meteo2.utils.Util;
+import com.nicolas.android.meteo2.utils.UtilAPI;
+
+import org.json.JSONException;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -29,100 +38,169 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView mTextViewCityName;
-    private FloatingActionButton mFloatingActionButtonAdd;
-    private LinearLayout mLinearLayoutCity;
+
+    private static final double LAT = 40.716709;
+    private static final double LNG = -74.005698;
+
+    private FloatingActionButton mFloatingButtonFavorite;
+
+    private ProgressBar mProgressBarMain;
+
+    private LinearLayout mLinearLayoutMain;
     private TextView mTextViewNoConnection;
-    private EditText mEditTextMessage;
+
+    private TextView mTextViewCity;
+    private TextView mTextViewDetails;
+    private TextView mTextViewCurrentTemperature;
+    private ImageView mImageViewWeatherIcon;
+
+    private Handler mHandler;
+    private OkHttpClient mOkHttpClient;
+    private City mCurrentCity;
 
     private Context mContext;
 
-    private OkHttpClient mOkHttpClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Log.d("TAG", "MainActivity: onCreate()");
-
         mContext = this;
+        mHandler = new Handler();
         mOkHttpClient = new OkHttpClient();
 
-
-
-
-
-        mTextViewCityName = (TextView) findViewById(R.id.text_view_city_name);
-        mTextViewCityName.setText(R.string.city_name);
-
-        mLinearLayoutCity = (LinearLayout) findViewById(R.id.id_linear_current_city);
+        mLinearLayoutMain = (LinearLayout) findViewById(R.id.linear_layout_current_city);
         mTextViewNoConnection = (TextView) findViewById(R.id.text_view_no_connection);
-        mFloatingActionButtonAdd = (FloatingActionButton) findViewById(R.id.floating_button_add);
-        mEditTextMessage = (EditText) findViewById(R.id.edit_text_message);
+        mFloatingButtonFavorite = (FloatingActionButton) findViewById(R.id.floating_action_button_favorite);
 
-        mFloatingActionButtonAdd.setOnClickListener(new View.OnClickListener() {
+
+        mProgressBarMain = (ProgressBar) findViewById(R.id.progress_bar_main);
+        mFloatingButtonFavorite = (FloatingActionButton) findViewById(R.id.floating_action_button_favorite);
+
+        mTextViewCity = (TextView) findViewById(R.id.text_view_city_name);
+        mTextViewDetails = (TextView) findViewById(R.id.text_view_city_desc);
+        mTextViewCurrentTemperature = (TextView) findViewById(R.id.text_view_city_temp);
+        mImageViewWeatherIcon = (ImageView) findViewById(R.id.image_view_city_weather);
+
+
+        mFloatingButtonFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                Log.d("TAG", "Clic sur le bouton avec un coeur");
+            public void onClick(View view) {
                 Intent intent = new Intent(mContext, FavoriteActivity.class);
-                intent.putExtra("key_message", mEditTextMessage.getText().toString());
                 startActivity(intent);
             }
         });
 
-
-        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(
-                mContext.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
-            Log.d("TAG", "Oui je suis connecté");
+        initViews();
 
 
-            //TEST
-            Request request = new Request.Builder().url("https://api.openweathermap.org/data/2.5/weather?lat=47.390026&lon=0.688891&appid=6d5354d77bc2d1bb385e9a0a369b9712").build();
-            mOkHttpClient.newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    Log.d("TAG", "ComprendPo");
-                    e.printStackTrace();
-
-                }
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    if (response.isSuccessful()) {
-                        final String stringJson = response.body().string();
-                        Log.d("TAG", stringJson);
-                    }
-                }
-            });
-            //FIN TEST
-
-
+        if (Util.isActiveNetwork(mContext)) {
+            updateWeatherDataCoordinates();
         } else {
-            Log.d("TAG", "Non j’ai rien du tout");
-            updateViewNoConnection();
+            updateViewError(R.string.no_connexion);
         }
 
     }
 
+    public void initViews() {
+
+        mLinearLayoutMain.setVisibility(View.INVISIBLE);
+        mTextViewNoConnection.setVisibility(View.INVISIBLE);
+        mFloatingButtonFavorite.setVisibility(View.INVISIBLE);
+        mProgressBarMain.setVisibility(View.VISIBLE);
+    }
+
+    public void updateViewError(int resString) {
+
+        mLinearLayoutMain.setVisibility(View.INVISIBLE);
+        mProgressBarMain.setVisibility(View.INVISIBLE);
+        mFloatingButtonFavorite.setVisibility(View.INVISIBLE);
+        mTextViewNoConnection.setVisibility(View.VISIBLE);
+        mTextViewNoConnection.setText(resString);
+    }
+
+    public void updateWeatherDataCoordinates() {
+
+        String[] params = {String.valueOf(LAT), String.valueOf(LNG)};
+
+        String s = String.format(UtilAPI.OPEN_WEATHER_MAP_API_COORDINATES, (Object[]) params);
+        Log.d("TAG", "updateWeatherDataCoordinates: " + s);
+        Request request = new Request.Builder().url(s).build();
+        mOkHttpClient.newCall(request).enqueue(new Callback() {
+
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("TAG", "onFailure: ");
+            }
+
+            @Override
+            public void onResponse(Call call, final Response response) throws IOException {
+
+                final String stringJson = response.body().string();
+                Log.d("TAG", "onResponse: " + stringJson);
+                if (response.isSuccessful() && UtilAPI.isSuccessful(stringJson)) {
+
+                    mHandler.post(new Runnable() {
+                        public void run() {
+                            renderCurrentWeather(stringJson);
+                        }
+                    });
+                } else {
+                    mHandler.post(new Runnable() {
+                        public void run() {
+                            updateViewError(R.string.place_not_found);
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    private void renderCurrentWeather(String jsonString) {
+
+        try {
+            mCurrentCity = new City(jsonString);
+
+            mTextViewCity.setText(mCurrentCity.mName.toUpperCase(Locale.US));
+            mTextViewDetails.setText(mCurrentCity.mDescription);
+            mTextViewCurrentTemperature.setText(mCurrentCity.mTemperature);
+            mImageViewWeatherIcon.setImageResource(mCurrentCity.mWeatherResIconWhite);
+
+            mLinearLayoutMain.setVisibility(View.VISIBLE);
+            mFloatingButtonFavorite.setVisibility(View.VISIBLE);
+            mProgressBarMain.setVisibility(View.GONE);
+
+        } catch (JSONException e) {
+            updateViewError(R.string.api_error);
+        }
+    }
+
     public void updateViewNoConnection() {
-        mLinearLayoutCity.setVisibility(View.INVISIBLE);
-        mFloatingActionButtonAdd.setVisibility(View.INVISIBLE);
+        mLinearLayoutMain.setVisibility(View.INVISIBLE);
+        mFloatingButtonFavorite.setVisibility(View.INVISIBLE);
         mTextViewNoConnection.setVisibility(View.VISIBLE);
     }
 
-
-/*    public void onClickFloatingAdd(View view) {
-        Log.d("TAG", "Clic sur Bouton");
-    }*/
-
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.d("TAG", "MainActivity: onDestroy()");
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
 
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
 
+        return super.onOptionsItemSelected(item);
+    }
 }
