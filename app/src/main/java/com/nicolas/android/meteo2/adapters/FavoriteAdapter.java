@@ -17,8 +17,7 @@ import com.nicolas.android.meteo2.models.City;
 
 import java.util.ArrayList;
 
-public class FavoriteAdapter
-        extends RecyclerView.Adapter<FavoriteAdapter.ViewHolder> {
+public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHolder> {
 
     private ArrayList<City> mArrayListCities;
     private Context mContext;

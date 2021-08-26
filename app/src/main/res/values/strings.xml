@@ -13,7 +13,7 @@
     <string name="delete">Delete </string>
     <string name="api_error">An error has occured</string>
     <string name="place_not_found">City not found </string>
-
+    <string name="title_activity_maps">Map</string>
 
 
 </resources>

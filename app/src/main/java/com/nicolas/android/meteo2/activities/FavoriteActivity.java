@@ -3,6 +3,7 @@ package com.nicolas.android.meteo2.activities;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.material.appbar.CollapsingToolbarLayout;
@@ -17,9 +18,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.nicolas.android.meteo2.R;
@@ -52,6 +55,9 @@ public class FavoriteActivity extends AppCompatActivity {
     private City mCityRemoved;
     private int mPositionCityRemoved;
 
+    private City mCityShowMap;
+    private int mPositionCityShowed;
+
     private Handler mHandler;
     private OkHttpClient mOkHttpClient;
 
@@ -83,6 +89,10 @@ public class FavoriteActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int id) {
                         if (editTextCity.getText().toString().length() > 0) {
                             updateWeatherDataCityName(editTextCity.getText().toString());
+
+                            //TEST
+                            startActivity(new Intent(mContext, MapsActivity.class));
+                            //FIN TEST
                         }
                     }
                 });
@@ -95,6 +105,9 @@ public class FavoriteActivity extends AppCompatActivity {
                 builder.create().show();
             }
         });
+
+
+
 
         mCities = UtilDB.initFavoriteCitiesFromDB(mContext);
 
@@ -118,7 +131,11 @@ public class FavoriteActivity extends AppCompatActivity {
         mRecyclerView.setAdapter(mAdapter);
 
 
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+
+
+
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
                 return false;
@@ -147,7 +164,36 @@ public class FavoriteActivity extends AppCompatActivity {
             }
         });
 
+        ItemTouchHelper itemTouchHelperMap = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+
+
+
+                mPositionCityShowed = ((FavoriteAdapter.ViewHolder) viewHolder).position;
+                mCityShowMap = mCities.get(mPositionCityShowed);
+
+
+                //startActivity(new Intent(mContext, MapsActivity.class));
+                Log.d("TAG", "onSwiped: " + mCityShowMap.mLatitude + " " + mCityShowMap.mLongitude);
+                startActivity(new Intent(mContext, MapsActivity.class).putExtra("lat",mCityShowMap.mLatitude).putExtra("long",mCityShowMap.mLongitude));
+
+                //Fonctionne pour reset le swipe mais est déprécié
+                //mAdapter.notifyItemChanged(viewHolder.getAdapterPosition());
+
+                //ok
+                mAdapter.notifyItemChanged(viewHolder.getBindingAdapterPosition());
+            }
+        });
+
         itemTouchHelper.attachToRecyclerView(mRecyclerView);
+        itemTouchHelperMap.attachToRecyclerView(mRecyclerView);
+
     }
 
     public void updateWeatherDataCityName(final String cityName) {

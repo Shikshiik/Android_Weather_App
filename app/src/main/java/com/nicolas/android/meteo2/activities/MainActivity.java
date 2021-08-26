@@ -97,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
         mImageViewWeatherIcon = (ImageView) findViewById(R.id.image_view_city_weather);
 
         mFloatingButtonFavorite.setOnClickListener(v -> startActivity(new Intent(mContext, FavoriteActivity.class)));
+        //mFloatingButtonFavorite.setOnClickListener(v -> startActivity(new Intent(mContext, MapsActivity.class)));
 
         initViews();
         initLocationListener();
