@@ -1,9 +1,15 @@
 package com.nicolas.android.meteo2.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -17,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.nicolas.android.meteo2.R;
@@ -38,9 +45,16 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
+    final private int REQUEST_CODE = 123;
 
     private static final double LAT = 40.716709;
     private static final double LNG = -74.005698;
+
+
+    private LocationManager mLocationManager;
+    private LocationListener mLocationListener;
+
+    private Location mCurrentLocation;
 
     private FloatingActionButton mFloatingButtonFavorite;
 
@@ -74,7 +88,6 @@ public class MainActivity extends AppCompatActivity {
         mTextViewNoConnection = (TextView) findViewById(R.id.text_view_no_connection);
         mFloatingButtonFavorite = (FloatingActionButton) findViewById(R.id.floating_action_button_favorite);
 
-
         mProgressBarMain = (ProgressBar) findViewById(R.id.progress_bar_main);
         mFloatingButtonFavorite = (FloatingActionButton) findViewById(R.id.floating_action_button_favorite);
 
@@ -83,23 +96,48 @@ public class MainActivity extends AppCompatActivity {
         mTextViewCurrentTemperature = (TextView) findViewById(R.id.text_view_city_temp);
         mImageViewWeatherIcon = (ImageView) findViewById(R.id.image_view_city_weather);
 
-
-        mFloatingButtonFavorite.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(mContext, FavoriteActivity.class);
-                startActivity(intent);
-            }
-        });
+        mFloatingButtonFavorite.setOnClickListener(v -> startActivity(new Intent(mContext, FavoriteActivity.class)));
 
         initViews();
-
+        initLocationListener();
 
         if (Util.isActiveNetwork(mContext)) {
-            updateWeatherDataCoordinates();
+            //updateWeatherDataCoordinates();
+            updateWeatherDataCoordinatesFromMyLocation();
         } else {
             updateViewError(R.string.no_connexion);
         }
+
+    }
+
+    private void initLocationListener() {
+        mLocationListener = new LocationListener() {
+
+            @Override
+            public void onLocationChanged(Location location) {
+
+                mCurrentLocation = location;
+
+                Log.d("lol", "onLocationChanged: " + location);
+
+                // Récupération des données pour les coordonnées gps
+                updateWeatherDataCoordinates();
+
+                mLocationManager.removeUpdates(mLocationListener);
+            }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+            }
+
+            @Override
+            public void onProviderEnabled(String s) {
+            }
+
+            @Override
+            public void onProviderDisabled(String s) {
+            }
+        };
 
     }
 
@@ -120,25 +158,40 @@ public class MainActivity extends AppCompatActivity {
         mTextViewNoConnection.setText(resString);
     }
 
+    public void updateWeatherDataCoordinatesFromMyLocation() {
+
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},
+                    REQUEST_CODE);
+            Log.d("TAG", "updateWeatherDataCoordinatesFromMyLocation: ");
+        } else {
+            mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            //NETWORK_PROVIDER   ou GPS_PROVIDER
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocationListener);
+            Log.d("TAG", "updateWeatherDataCoordinatesFromMyLocation: " + mLocationManager);
+        }
+    }
+
     public void updateWeatherDataCoordinates() {
 
-        String[] params = {String.valueOf(LAT), String.valueOf(LNG)};
+        //String[] params = {String.valueOf(LAT), String.valueOf(LNG)};
+        String[] params = {String.valueOf(mCurrentLocation.getLatitude()), String.valueOf(mCurrentLocation.getLongitude())};
+
 
         String s = String.format(UtilAPI.OPEN_WEATHER_MAP_API_COORDINATES, (Object[]) params);
-        Log.d("TAG", "updateWeatherDataCoordinates: " + s);
         Request request = new Request.Builder().url(s).build();
         mOkHttpClient.newCall(request).enqueue(new Callback() {
 
             @Override
             public void onFailure(Call call, IOException e) {
-                Log.d("TAG", "onFailure: ");
+
             }
 
             @Override
             public void onResponse(Call call, final Response response) throws IOException {
 
                 final String stringJson = response.body().string();
-                Log.d("TAG", "onResponse: " + stringJson);
+
                 if (response.isSuccessful() && UtilAPI.isSuccessful(stringJson)) {
 
                     mHandler.post(new Runnable() {
@@ -176,12 +229,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void updateViewNoConnection() {
-        mLinearLayoutMain.setVisibility(View.INVISIBLE);
-        mFloatingButtonFavorite.setVisibility(View.INVISIBLE);
-        mTextViewNoConnection.setVisibility(View.VISIBLE);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -202,5 +249,26 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission Granted
+                    updateWeatherDataCoordinatesFromMyLocation();
+                    Log.d("TAG", "onRequestPermissionsResult: " + grantResults);
+                } else {
+                    // Permission Denied
+                    Toast.makeText(MainActivity.this, "Location Permission Denied", Toast.LENGTH_SHORT)
+                            .show();
+                    Log.d("TAG", "onRequestPermissionsResult: " + grantResults);
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 }
