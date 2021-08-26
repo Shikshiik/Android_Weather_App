@@ -6,7 +6,9 @@ import android.net.NetworkInfo;
 
 
 import com.nicolas.android.meteo2.R;
+import com.nicolas.android.meteo2.models.City;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -145,6 +147,5 @@ public class Util {
         }
         return "";
     }
-
 
 }

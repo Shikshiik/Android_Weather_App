@@ -17,17 +17,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.nicolas.android.meteo2.R;
 import com.nicolas.android.meteo2.adapters.FavoriteAdapter;
 import com.nicolas.android.meteo2.models.City;
 import com.nicolas.android.meteo2.utils.UtilAPI;
+import com.nicolas.android.meteo2.utils.UtilDB;
 
 import org.json.JSONException;
 
@@ -97,9 +96,10 @@ public class FavoriteActivity extends AppCompatActivity {
             }
         });
 
-        mCities = new ArrayList<>();
+        mCities = UtilDB.initFavoriteCitiesFromDB(mContext);
 
-        /*City city1 = new City("Montréal", "Légères pluies", "22°C", R.drawable.weather_rainy_grey);
+        /*
+        City city1 = new City("Montréal", "Légères pluies", "22°C", R.drawable.weather_rainy_grey);
         City city2 = new City("New York", "Ensoleillé", "22°C", R.drawable.weather_sunny_grey);
         City city3 = new City("Paris", "Nuageux", "24°C", R.drawable.weather_foggy_grey);
         City city4 = new City("Toulouse", "Pluies modérées", "20°C", R.drawable.weather_rainy_grey);
@@ -108,7 +108,7 @@ public class FavoriteActivity extends AppCompatActivity {
         mCities.add(city2);
         mCities.add(city3);
         mCities.add(city4);
-*/
+        */
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view_favorite);
 
         mLayoutManager = new LinearLayoutManager(this);
@@ -129,14 +129,16 @@ public class FavoriteActivity extends AppCompatActivity {
 
                 mPositionCityRemoved = ((FavoriteAdapter.ViewHolder) viewHolder).position;
                 mCityRemoved = mCities.remove(mPositionCityRemoved);
-
                 mAdapter.notifyDataSetChanged();
+
+                UtilDB.deleteFavoriteCityToDB(mContext, mCityRemoved.mIdDataBase);
 
                 Snackbar.make(findViewById(R.id.myCoordinatorLayout), mCityRemoved.mName + " est supprimé", Snackbar.LENGTH_LONG)
                         .setAction("Annuler", new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 mCities.add(mPositionCityRemoved, mCityRemoved);
+                                UtilDB.saveFavouriteCitiesToDB(mContext, mCityRemoved);
                                 mAdapter.notifyDataSetChanged();
                             }
                         })
@@ -151,7 +153,7 @@ public class FavoriteActivity extends AppCompatActivity {
     public void updateWeatherDataCityName(final String cityName) {
 
         String[] params = {cityName};
-        String s = String.format(UtilAPI.OPEN_WEATHER_MAP_API_CITY_NAME, (Object[]) params);
+        String s = String.format(UtilAPI.OPEN_WEATHER_MAP_API_CITY_NAME, params);
         Request request = new Request.Builder().url(s).build();
         mOkHttpClient.newCall(request).enqueue(new Callback() {
 
@@ -169,15 +171,12 @@ public class FavoriteActivity extends AppCompatActivity {
                     mHandler.post(new Runnable() {
                         public void run() {
                             renderFavoriteCityWeather(stringJson);
-                            Log.d("TAG", "run: " + stringJson);
                         }
                     });
                 } else {
                     mHandler.post(new Runnable() {
                         public void run() {
                             Toast.makeText(mContext, getString(R.string.place_not_found), Toast.LENGTH_LONG).show();
-                            Log.d("TAG", "run: " + stringJson);
-
                         }
                     });
                 }
@@ -191,11 +190,10 @@ public class FavoriteActivity extends AppCompatActivity {
             City city = new City(stringJson);
             mCities.add(city);
             mAdapter.notifyDataSetChanged();
+
+            UtilDB.saveFavouriteCitiesToDB(mContext, city);
         } catch (JSONException e) {
             Toast.makeText(mContext, getString(R.string.place_not_found), Toast.LENGTH_LONG).show();
-            Log.d("TAG", "renderFavoriteCityWeather: " + stringJson);
-
         }
     }
-
 }

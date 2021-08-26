@@ -7,6 +7,8 @@ import org.json.JSONObject;
 
 public class City {
 
+    public int mIdDataBase;
+
     public int mIdCity;
     public String mName;
     public String mCountry;
@@ -18,6 +20,9 @@ public class City {
     public double mLongitude;
 
     public String mStringJson;
+
+    public City() {
+    }
 
     public City(String stringJson) throws JSONException {
 
