@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
 
                 mCurrentLocation = location;
 
-                Log.d("lol", "onLocationChanged: " + location);
+                Log.d("TAG", "onLocationChanged: " + location);
 
                 // Récupération des données pour les coordonnées gps
                 updateWeatherDataCoordinates();
@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},
                     REQUEST_CODE);
-            Log.d("TAG", "updateWeatherDataCoordinatesFromMyLocation: ");
+            Log.d("TAG", "updateWeatherDataCoordinatesFromMyLocation: " + ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION));
         } else {
             mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             //NETWORK_PROVIDER   ou GPS_PROVIDER

@@ -89,10 +89,6 @@ public class FavoriteActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int id) {
                         if (editTextCity.getText().toString().length() > 0) {
                             updateWeatherDataCityName(editTextCity.getText().toString());
-
-                            //TEST
-                            startActivity(new Intent(mContext, MapsActivity.class));
-                            //FIN TEST
                         }
                     }
                 });
@@ -181,7 +177,14 @@ public class FavoriteActivity extends AppCompatActivity {
 
                 //startActivity(new Intent(mContext, MapsActivity.class));
                 Log.d("TAG", "onSwiped: " + mCityShowMap.mLatitude + " " + mCityShowMap.mLongitude);
-                startActivity(new Intent(mContext, MapsActivity.class).putExtra("lat",mCityShowMap.mLatitude).putExtra("long",mCityShowMap.mLongitude));
+                startActivity(new Intent(mContext, MapsActivity.class)
+                        .putExtra("lat",mCityShowMap.mLatitude)
+                        .putExtra("long",mCityShowMap.mLongitude)
+                        .putExtra("cityName", mCityShowMap.mName)
+                );
+
+
+
 
                 //Fonctionne pour reset le swipe mais est déprécié
                 //mAdapter.notifyItemChanged(viewHolder.getAdapterPosition());

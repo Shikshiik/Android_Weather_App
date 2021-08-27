@@ -47,11 +47,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.d("TAG", "onMapReady: " + extras);
         //LatLng sydney = new LatLng(-34, 151);
         LatLng city = new LatLng(extras.getDouble("lat"), extras.getDouble("long"));
-
+        String cityName = new String(extras.getString("cityName"));
         //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
-        mMap.addMarker(new MarkerOptions().position(city).title("Marker in my favorite city"));
+        mMap.addMarker(new MarkerOptions().position(city).title(cityName));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(city));
     }
 }
