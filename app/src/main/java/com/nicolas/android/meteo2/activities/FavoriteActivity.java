@@ -69,7 +69,7 @@ public class FavoriteActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         CollapsingToolbarLayout toolBarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
-        toolBarLayout.setTitle("Vos favoris");
+        toolBarLayout.setTitle(getResources().getString(R.string.your_favorites));
 
         mContext = this;
         mHandler = new Handler();

@@ -9,10 +9,13 @@
     <string name="title_activity_favorite"></string>
     <string name="action_settings">Paramètres</string>
     <string name="add_city">Nom de ville</string>
-    <string name="supprimer">Supprimer</string>
     <string name="petites_pluies">Légères pluies</string>
-    <string name="delete">Supprimer </string>
     <string name="api_error">Une erreur s\'est produite</string>
     <string name="place_not_found">Ville introuvable</string>
+    <string name="title_activity_maps">Carte</string>
+    <string name="deleted">est supprimé</string>
+    <string name="cancel">Annuler</string>
+    <string name="your_favorites">Vos favoris</string>
+
 
 </resources>

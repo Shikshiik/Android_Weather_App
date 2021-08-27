@@ -85,7 +85,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
             final int position = holder.position;
 
             final AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-            builder.setMessage("Delete " + holder.mTextViewCity.getText().toString() + " ?");
+            builder.setMessage("Supprimer " + holder.mTextViewCity.getText().toString() + " ?");
             builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     mArrayListCities.remove(position);
